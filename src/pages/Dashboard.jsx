@@ -125,7 +125,11 @@ export default function Dashboard() {
               )}
 
               {hasResult && status !== "loading" && (
-                <ActiveView activeView={activeView} key={activeView} result={result} />
+                <ActiveView
+                  activeView={activeView}
+                  key={`${activeView}-${result.ticker}-${result.dates.length}`}
+                  result={result}
+                />
               )}
 
               {!hasResult && status !== "loading" && (
