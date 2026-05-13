@@ -28,23 +28,24 @@ Market regimes, distinct periods characterized by persistent levels of volatilit
 
 ```
 HMM-for-Market-Regime-Detection/
-├── README.md
-├── requirements.txt
-├── utils/                          # Shared utility modules
-│   ├── data_utils.py               # Data fetching (yfinance) and feature engineering
-│   ├── viz_utils.py                # Plotly-based visualization helpers
-│   └── metrics.py                  # Statistical and financial evaluation metrics
-├── 01_hmm_from_scratch/            # Educational implementation of core HMM algorithms
-│   ├── hmm_core.py                 # GaussianHMM class (Forward, Backward, Viterbi, Baum-Welch)
-│   └── 01_hmm_from_scratch.ipynb  # Notebook applying the custom HMM to financial data
-├── 02_hmm_libraries/               # HMM implementation using popular Python libraries
-│   └── 02_hmm_libraries.ipynb     # Comparison of hmmlearn and pomegranate with the from-scratch model
-├── 03_alternative_methods/         # Benchmarking alternative clustering and ML approaches
-│   └── 03_alternative_methods.ipynb  # Implementation of GMM, K-Means, DBSCAN, etc.
-└── 04_model_comparison/            # Comprehensive quantitative comparison of all methods
-    └── 04_model_comparison.ipynb  # Dashboard for evaluating and ranking all models
+|-- app/                         # FastAPI backend, routes, schemas, services, Ray tasks, optimization
+|-- market_regime/               # Reusable HMM market regime Python package
+|-- src/                         # React dashboard source
+|-- public/                      # Frontend static assets and runtime config
+|-- docker/                      # Backend/frontend Dockerfiles and Nginx runtime config
+|-- k8s/                         # Minimal Kubernetes deployment and service manifests
+|-- requirements/                # Python dependency files
+|-- docs/                        # Project report and mathematical reference PDFs
+|-- examples/                    # Reusable Python API examples
+|-- utils/                       # Research utility modules used by notebooks
+|-- 01_hmm_from_scratch/         # Educational NumPy HMM implementation
+|-- 02_hmm_libraries/            # Library-based HMM experiments
+|-- 03_alternative_methods/      # Alternative clustering/ML approaches
+|-- 04_model_comparison/         # Model comparison notebooks
+|-- docker-compose.yml           # Full-stack local container orchestration
+|-- package.json                 # React/Vite dependencies and scripts
+`-- README.md
 ```
-
 ---
 
 ## Mathematical Core
@@ -83,7 +84,7 @@ It is highly recommended to use a virtual environment.
 ```bash
 python -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements/base.txt
 ```
 
 ---
@@ -183,23 +184,23 @@ On PowerShell:
 
 ```powershell
 minikube docker-env | Invoke-Expression
-docker build -t hmm-backend:latest -f Dockerfile.backend .
-docker build -t hmm-frontend:latest -f Dockerfile.frontend .
+docker build -t hmm-backend:latest -f docker/backend/Dockerfile .
+docker build -t hmm-frontend:latest -f docker/frontend/Dockerfile .
 ```
 
 On macOS/Linux shells:
 
 ```bash
 eval $(minikube docker-env)
-docker build -t hmm-backend:latest -f Dockerfile.backend .
-docker build -t hmm-frontend:latest -f Dockerfile.frontend .
+docker build -t hmm-backend:latest -f docker/backend/Dockerfile .
+docker build -t hmm-frontend:latest -f docker/frontend/Dockerfile .
 ```
 
 Apply the Kubernetes manifests:
 
 ```bash
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
 ```
 
 Check the running pods:

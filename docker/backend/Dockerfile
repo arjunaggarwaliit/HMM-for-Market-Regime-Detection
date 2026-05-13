@@ -11,9 +11,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements-backend.txt .
+COPY requirements/backend.txt .
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements-backend.txt
+    && pip install --no-cache-dir -r backend.txt
 
 COPY app ./app
 COPY market_regime ./market_regime
