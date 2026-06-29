@@ -6,8 +6,8 @@ dist
 __pycache__
 *.py[cod]
 *.log
-01_hmm_from_scratch
-02_hmm_libraries
-03_alternative_methods
-04_model_comparison
+hmm_from_scratch
+hmm_libraries
+alternative_methods
+model_comparison
 docs/*.pdf

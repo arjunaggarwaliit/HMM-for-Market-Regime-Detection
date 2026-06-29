@@ -1,0 +1,642 @@
+{
+  "ticker": "SPY",
+  "start": "2018-01-01",
+  "end": "2024-12-31",
+  "rows": 1641,
+  "rf_oos_accuracy": 1.0,
+  "models": [
+    {
+      "name": "HMM Scratch",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.383837,
+          "Volatility (ann.)": 0.09152,
+          "Sharpe (ann.)": 4.194033,
+          "Sortino (ann.)": 6.904178,
+          "Max Drawdown": -0.046965,
+          "Calmar": 8.17288,
+          "Hit Rate": 0.617325,
+          "VaR 5%": -0.007821,
+          "CVaR 5%": -0.010959,
+          "Skewness": -0.099095,
+          "Excess Kurtosis": 0.302644,
+          "# Days": 912,
+          "% of Sample": 55.575868
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": -0.121835,
+          "Volatility (ann.)": 0.225018,
+          "Sharpe (ann.)": -0.541447,
+          "Sortino (ann.)": -0.837811,
+          "Max Drawdown": -0.31887,
+          "Calmar": -0.382084,
+          "Hit Rate": 0.472622,
+          "VaR 5%": -0.024099,
+          "CVaR 5%": -0.031485,
+          "Skewness": -0.16785,
+          "Excess Kurtosis": 0.43604,
+          "# Days": 694,
+          "% of Sample": 42.291286
+        },
+        {
+          "State": 2,
+          "Mean Return (ann.)": -1.337263,
+          "Volatility (ann.)": 0.761961,
+          "Sharpe (ann.)": -1.755027,
+          "Sortino (ann.)": -2.862325,
+          "Max Drawdown": -0.327513,
+          "Calmar": -4.083087,
+          "Hit Rate": 0.428571,
+          "VaR 5%": -0.087089,
+          "CVaR 5%": -0.108228,
+          "Skewness": -0.104401,
+          "Excess Kurtosis": -0.230957,
+          "# Days": 35,
+          "% of Sample": 2.132846
+        }
+      ],
+      "mean_persistence_days": 38.43333333333334,
+      "transition_states": [
+        0,
+        1,
+        2
+      ],
+      "transition_matrix": [
+        [
+          0.9781,
+          0.0208,
+          0.0011
+        ],
+        [
+          0.0274,
+          0.9726,
+          0.0
+        ],
+        [
+          0.0,
+          0.0286,
+          0.9714
+        ]
+      ],
+      "avg_wasserstein_distance": 0.023605666666666664
+    },
+    {
+      "name": "hmmlearn HMM",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.305696,
+          "Volatility (ann.)": 0.111375,
+          "Sharpe (ann.)": 2.744757,
+          "Sortino (ann.)": 3.930819,
+          "Max Drawdown": -0.099743,
+          "Calmar": 3.064838,
+          "Hit Rate": 0.59447,
+          "VaR 5%": -0.0113,
+          "CVaR 5%": -0.015573,
+          "Skewness": -0.358173,
+          "Excess Kurtosis": 1.061764,
+          "# Days": 1085,
+          "% of Sample": 66.118221
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": -0.107429,
+          "Volatility (ann.)": 0.238354,
+          "Sharpe (ann.)": -0.450713,
+          "Sortino (ann.)": -0.693937,
+          "Max Drawdown": -0.263136,
+          "Calmar": -0.408264,
+          "Hit Rate": 0.474286,
+          "VaR 5%": -0.025987,
+          "CVaR 5%": -0.033221,
+          "Skewness": -0.158832,
+          "Excess Kurtosis": 0.410032,
+          "# Days": 525,
+          "% of Sample": 31.992687
+        },
+        {
+          "State": 2,
+          "Mean Return (ann.)": -1.825117,
+          "Volatility (ann.)": 0.799185,
+          "Sharpe (ann.)": -2.283722,
+          "Sortino (ann.)": -3.907625,
+          "Max Drawdown": -0.304445,
+          "Calmar": -5.994907,
+          "Hit Rate": 0.387097,
+          "VaR 5%": -0.090941,
+          "CVaR 5%": -0.108228,
+          "Skewness": 0.001349,
+          "Excess Kurtosis": -0.443928,
+          "# Days": 31,
+          "% of Sample": 1.889092
+        }
+      ],
+      "mean_persistence_days": 91.16666666666667,
+      "transition_states": [
+        0,
+        1,
+        2
+      ],
+      "transition_matrix": [
+        [
+          0.9945,
+          0.0046,
+          0.0009
+        ],
+        [
+          0.0114,
+          0.9886,
+          0.0
+        ],
+        [
+          0.0,
+          0.0323,
+          0.9677
+        ]
+      ],
+      "avg_wasserstein_distance": 0.025284333333333336
+    },
+    {
+      "name": "GMM",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 4.331958,
+          "Volatility (ann.)": 0.054933,
+          "Sharpe (ann.)": 78.858771,
+          "Sortino (ann.)": NaN,
+          "Max Drawdown": 0.0,
+          "Calmar": NaN,
+          "Hit Rate": 1.0,
+          "VaR 5%": 0.013222,
+          "CVaR 5%": 0.0131,
+          "Skewness": 0.886819,
+          "Excess Kurtosis": -0.319596,
+          "# Days": 134,
+          "% of Sample": 8.165753
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": 0.094108,
+          "Volatility (ann.)": 0.102778,
+          "Sharpe (ann.)": 0.91565,
+          "Sortino (ann.)": 1.427731,
+          "Max Drawdown": -0.39268,
+          "Calmar": 0.239656,
+          "Hit Rate": 0.543668,
+          "VaR 5%": -0.011509,
+          "CVaR 5%": -0.013664,
+          "Skewness": -0.277495,
+          "Excess Kurtosis": -0.412113,
+          "# Days": 1374,
+          "% of Sample": 83.729433
+        },
+        {
+          "State": 2,
+          "Mean Return (ann.)": -3.692373,
+          "Volatility (ann.)": 0.488824,
+          "Sharpe (ann.)": -7.553581,
+          "Sortino (ann.)": -15.428658,
+          "Max Drawdown": -0.85289,
+          "Calmar": -4.329247,
+          "Hit Rate": 0.18797,
+          "VaR 5%": -0.04599,
+          "CVaR 5%": -0.072162,
+          "Skewness": 0.819879,
+          "Excess Kurtosis": 2.198255,
+          "# Days": 133,
+          "% of Sample": 8.104814
+        }
+      ],
+      "mean_persistence_days": 3.151112700750403,
+      "transition_states": [
+        0,
+        1,
+        2
+      ],
+      "transition_matrix": [
+        [
+          0.0672,
+          0.8284,
+          0.1045
+        ],
+        [
+          0.0816,
+          0.858,
+          0.0605
+        ],
+        [
+          0.0977,
+          0.6316,
+          0.2707
+        ]
+      ],
+      "avg_wasserstein_distance": 0.027348
+    },
+    {
+      "name": "K-Means",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.63239,
+          "Volatility (ann.)": 0.112789,
+          "Sharpe (ann.)": 5.606825,
+          "Sortino (ann.)": 12.11742,
+          "Max Drawdown": -0.03352,
+          "Calmar": 18.86593,
+          "Hit Rate": 0.615441,
+          "VaR 5%": -0.008182,
+          "CVaR 5%": -0.010444,
+          "Skewness": 0.435134,
+          "Excess Kurtosis": 0.194669,
+          "# Days": 1360,
+          "% of Sample": 82.876295
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": -4.695521,
+          "Volatility (ann.)": 0.233189,
+          "Sharpe (ann.)": -20.136116,
+          "Sortino (ann.)": -20.959317,
+          "Max Drawdown": -0.975134,
+          "Calmar": -4.815255,
+          "Hit Rate": 0.040201,
+          "VaR 5%": -0.038952,
+          "CVaR 5%": -0.063469,
+          "Skewness": -2.87405,
+          "Excess Kurtosis": 14.852109,
+          "# Days": 199,
+          "% of Sample": 12.126752
+        },
+        {
+          "State": 2,
+          "Mean Return (ann.)": 3.573904,
+          "Volatility (ann.)": 0.383715,
+          "Sharpe (ann.)": 9.313965,
+          "Sortino (ann.)": 19.790001,
+          "Max Drawdown": -0.059239,
+          "Calmar": 60.330016,
+          "Hit Rate": 0.743902,
+          "VaR 5%": -0.025679,
+          "CVaR 5%": -0.03197,
+          "Skewness": 0.334067,
+          "Excess Kurtosis": 0.833226,
+          "# Days": 82,
+          "% of Sample": 4.996953
+        }
+      ],
+      "mean_persistence_days": 4.865395245992261,
+      "transition_states": [
+        0,
+        1,
+        2
+      ],
+      "transition_matrix": [
+        [
+          0.9014,
+          0.0898,
+          0.0088
+        ],
+        [
+          0.598,
+          0.3266,
+          0.0754
+        ],
+        [
+          0.1829,
+          0.1463,
+          0.6707
+        ]
+      ],
+      "avg_wasserstein_distance": 0.023550666666666664
+    },
+    {
+      "name": "DBSCAN",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.136953,
+          "Volatility (ann.)": 0.15718,
+          "Sharpe (ann.)": 0.871314,
+          "Sortino (ann.)": 1.161264,
+          "Max Drawdown": -0.199943,
+          "Calmar": 0.684959,
+          "Hit Rate": 0.551438,
+          "VaR 5%": -0.016958,
+          "CVaR 5%": -0.02413,
+          "Skewness": -0.421268,
+          "Excess Kurtosis": 1.499918,
+          "# Days": 1565,
+          "% of Sample": 95.368678
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": 0.45157,
+          "Volatility (ann.)": 0.166389,
+          "Sharpe (ann.)": 2.71394,
+          "Sortino (ann.)": 4.758404,
+          "Max Drawdown": -0.042407,
+          "Calmar": 10.648444,
+          "Hit Rate": 0.590909,
+          "VaR 5%": -0.017468,
+          "CVaR 5%": -0.018988,
+          "Skewness": -0.48039,
+          "Excess Kurtosis": -0.742675,
+          "# Days": 22,
+          "% of Sample": 1.340646
+        },
+        {
+          "State": 3,
+          "Mean Return (ann.)": -0.103038,
+          "Volatility (ann.)": 0.673731,
+          "Sharpe (ann.)": -0.152937,
+          "Sortino (ann.)": -0.227859,
+          "Max Drawdown": -0.248756,
+          "Calmar": -0.414214,
+          "Hit Rate": 0.555556,
+          "VaR 5%": -0.067055,
+          "CVaR 5%": -0.099256,
+          "Skewness": -0.393253,
+          "Excess Kurtosis": 0.222597,
+          "# Days": 54,
+          "% of Sample": 3.290676
+        }
+      ],
+      "mean_persistence_days": 49.59686147186147,
+      "transition_states": [
+        0,
+        1,
+        3
+      ],
+      "transition_matrix": [
+        [
+          0.9936,
+          0.0,
+          0.0064
+        ],
+        [
+          0.0455,
+          0.6818,
+          0.2727
+        ],
+        [
+          0.1667,
+          0.1296,
+          0.7037
+        ]
+      ],
+      "avg_wasserstein_distance": 0.017949999999999997
+    },
+    {
+      "name": "Isolation Forest",
+      "n_states": 2,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.210957,
+          "Volatility (ann.)": 0.146229,
+          "Sharpe (ann.)": 1.44265,
+          "Sortino (ann.)": 2.072101,
+          "Max Drawdown": -0.145339,
+          "Calmar": 1.45148,
+          "Hit Rate": 0.557125,
+          "VaR 5%": -0.015594,
+          "CVaR 5%": -0.020894,
+          "Skewness": -0.24432,
+          "Excess Kurtosis": 0.820984,
+          "# Days": 1558,
+          "% of Sample": 94.942108
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": -1.324934,
+          "Volatility (ann.)": 0.598725,
+          "Sharpe (ann.)": -2.212925,
+          "Sortino (ann.)": -3.746202,
+          "Max Drawdown": -0.3827,
+          "Calmar": -3.462068,
+          "Hit Rate": 0.457831,
+          "VaR 5%": -0.051761,
+          "CVaR 5%": -0.081821,
+          "Skewness": -0.05621,
+          "Excess Kurtosis": 0.33293,
+          "# Days": 83,
+          "% of Sample": 5.057892
+        }
+      ],
+      "mean_persistence_days": 28.3442118226601,
+      "transition_states": [
+        0,
+        1
+      ],
+      "transition_matrix": [
+        [
+          0.982,
+          0.018
+        ],
+        [
+          0.3373,
+          0.6627
+        ]
+      ],
+      "avg_wasserstein_distance": 0.024352
+    },
+    {
+      "name": "Wasserstein",
+      "n_states": 3,
+      "stats": [
+        {
+          "State": 0,
+          "Mean Return (ann.)": 0.131561,
+          "Volatility (ann.)": 0.149285,
+          "Sharpe (ann.)": 0.881272,
+          "Sortino (ann.)": 1.031234,
+          "Max Drawdown": -0.217224,
+          "Calmar": 0.605646,
+          "Hit Rate": 0.565476,
+          "VaR 5%": -0.01482,
+          "CVaR 5%": -0.024275,
+          "Skewness": -1.076315,
+          "Excess Kurtosis": 7.891091,
+          "# Days": 1176,
+          "% of Sample": 71.66362
+        },
+        {
+          "State": 1,
+          "Mean Return (ann.)": 0.027494,
+          "Volatility (ann.)": 0.273616,
+          "Sharpe (ann.)": 0.100485,
+          "Sortino (ann.)": 0.125814,
+          "Max Drawdown": -0.220948,
+          "Calmar": 0.124438,
+          "Hit Rate": 0.507317,
+          "VaR 5%": -0.025124,
+          "CVaR 5%": -0.040954,
+          "Skewness": -0.716877,
+          "Excess Kurtosis": 9.853415,
+          "# Days": 410,
+          "% of Sample": 24.984765
+        },
+        {
+          "State": 2,
+          "Mean Return (ann.)": 0.958427,
+          "Volatility (ann.)": 0.349938,
+          "Sharpe (ann.)": 2.738847,
+          "Sortino (ann.)": 4.172232,
+          "Max Drawdown": -0.069895,
+          "Calmar": 13.71241,
+          "Hit Rate": 0.6,
+          "VaR 5%": -0.030417,
+          "CVaR 5%": -0.04542,
+          "Skewness": -0.077572,
+          "Excess Kurtosis": 1.267012,
+          "# Days": 55,
+          "% of Sample": 3.351615
+        }
+      ],
+      "mean_persistence_days": 124.06666666666666,
+      "transition_states": [
+        0,
+        1,
+        2
+      ],
+      "transition_matrix": [
+        [
+          0.9966,
+          0.0034,
+          0.0
+        ],
+        [
+          0.0098,
+          0.9878,
+          0.0024
+        ],
+        [
+          0.0,
+          0.0182,
+          0.9818
+        ]
+      ],
+      "avg_wasserstein_distance": 0.007431666666666666
+    }
+  ],
+  "comparison": [
+    {
+      "Model": "HMM Scratch",
+      "States": 3,
+      "Mean Persistence": 38.43,
+      "Average Wasserstein": 0.023606,
+      "Main Interpretation": "Persistent latent volatility regimes with full educational transparency."
+    },
+    {
+      "Model": "hmmlearn HMM",
+      "States": 3,
+      "Mean Persistence": 91.17,
+      "Average Wasserstein": 0.025284,
+      "Main Interpretation": "Production-style Gaussian HMM with sticky transition prior."
+    },
+    {
+      "Model": "GMM",
+      "States": 3,
+      "Mean Persistence": 3.15,
+      "Average Wasserstein": 0.027348,
+      "Main Interpretation": "Distributional clustering without temporal memory."
+    },
+    {
+      "Model": "K-Means",
+      "States": 3,
+      "Mean Persistence": 4.87,
+      "Average Wasserstein": 0.023551,
+      "Main Interpretation": "Scaled feature-space clustering baseline."
+    },
+    {
+      "Model": "DBSCAN",
+      "States": 3,
+      "Mean Persistence": 49.6,
+      "Average Wasserstein": 0.01795,
+      "Main Interpretation": "Density/noise stress detector sensitive to epsilon."
+    },
+    {
+      "Model": "Isolation Forest",
+      "States": 2,
+      "Mean Persistence": 28.34,
+      "Average Wasserstein": 0.024352,
+      "Main Interpretation": "Binary anomaly overlay for stress periods."
+    },
+    {
+      "Model": "Wasserstein",
+      "States": 3,
+      "Mean Persistence": 124.07,
+      "Average Wasserstein": 0.007432,
+      "Main Interpretation": "Rolling-window distributional regime clustering."
+    }
+  ],
+  "events": [
+    {
+      "event": "COVID crash trough",
+      "date": "2020-03-23",
+      "close": 204.41827392578125,
+      "return": -0.025900555391607728,
+      "rvol_20d": 0.8325840088077704,
+      "HMM Scratch": 2,
+      "hmmlearn HMM": 2,
+      "GMM": 2,
+      "K-Means": 2,
+      "DBSCAN": 3,
+      "Isolation Forest": 1,
+      "Wasserstein": 1
+    },
+    {
+      "event": "2022 bear-market trough",
+      "date": "2022-10-12",
+      "close": 339.3785095214844,
+      "return": -0.0033040232291467538,
+      "rvol_20d": 0.24109154346930853,
+      "HMM Scratch": 1,
+      "hmmlearn HMM": 1,
+      "GMM": 1,
+      "K-Means": 1,
+      "DBSCAN": 0,
+      "Isolation Forest": 0,
+      "Wasserstein": 1
+    },
+    {
+      "event": "2023 soft-landing rally",
+      "date": "2023-07-31",
+      "close": 441.0342102050781,
+      "return": 0.0019021236227789934,
+      "rvol_20d": 0.07977587561409802,
+      "HMM Scratch": 0,
+      "hmmlearn HMM": 0,
+      "GMM": 1,
+      "K-Means": 0,
+      "DBSCAN": 0,
+      "Isolation Forest": 0,
+      "Wasserstein": 0
+    },
+    {
+      "event": "Late-2024 high",
+      "date": "2024-12-06",
+      "close": 595.5750122070312,
+      "return": 0.0018939000361718997,
+      "rvol_20d": 0.07457660273993966,
+      "HMM Scratch": 0,
+      "hmmlearn HMM": 0,
+      "GMM": 1,
+      "K-Means": 0,
+      "DBSCAN": 0,
+      "Isolation Forest": 0,
+      "Wasserstein": 0
+    }
+  ],
+  "frontend_url": "https://arjunaggarwaliit.github.io/HMM-for-Market-Regime-Detection/",
+  "repository_url": "https://github.com/arjunaggarwaliit/HMM-for-Market-Regime-Detection"
+}

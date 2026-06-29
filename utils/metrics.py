@@ -61,6 +61,36 @@ def conditional_sharpe(
             result[lbl] = np.nan
     return result
 
+def _max_drawdown(returns: np.ndarray) -> float:
+    if len(returns) == 0:
+        return np.nan
+    equity_curve = np.exp(np.cumsum(returns))
+    running_peak = np.maximum.accumulate(equity_curve)
+    drawdowns = equity_curve / running_peak - 1.0
+    return float(drawdowns.min())
+
+def downside_deviation(returns: np.ndarray, annualise: bool = True) -> float:
+    r = np.asarray(returns, dtype=float)
+    downside = r[r < 0]
+    if len(downside) == 0:
+        return 0.0
+    deviation = downside.std(ddof=0)
+    return float(deviation * np.sqrt(252)) if annualise else float(deviation)
+
+def value_at_risk(returns: np.ndarray, level: float = 0.05) -> float:
+    r = np.asarray(returns, dtype=float)
+    if len(r) == 0:
+        return np.nan
+    return float(np.quantile(r, level))
+
+def conditional_value_at_risk(returns: np.ndarray, level: float = 0.05) -> float:
+    r = np.asarray(returns, dtype=float)
+    if len(r) == 0:
+        return np.nan
+    threshold = np.quantile(r, level)
+    tail = r[r <= threshold]
+    return float(tail.mean()) if len(tail) else np.nan
+
 def regime_statistics(
     returns: np.ndarray,
     labels: np.ndarray,
@@ -69,11 +99,21 @@ def regime_statistics(
     for lbl in sorted(set(labels), key=str):
         mask = labels == lbl
         r = returns[mask]
+        annual_return = r.mean() * 252
+        annual_volatility = r.std(ddof=0) * np.sqrt(252)
+        downside = downside_deviation(r)
+        max_drawdown = _max_drawdown(r)
         rows.append({
             "State": lbl,
-            "Mean Return (ann.)": r.mean() * 252,
-            "Volatility (ann.)": r.std() * np.sqrt(252),
-            "Sharpe (ann.)": (r.mean() / r.std() * np.sqrt(252)) if r.std() > 0 else np.nan,
+            "Mean Return (ann.)": annual_return,
+            "Volatility (ann.)": annual_volatility,
+            "Sharpe (ann.)": annual_return / annual_volatility if annual_volatility > 0 else np.nan,
+            "Sortino (ann.)": annual_return / downside if downside > 0 else np.nan,
+            "Max Drawdown": max_drawdown,
+            "Calmar": annual_return / abs(max_drawdown) if max_drawdown < 0 else np.nan,
+            "Hit Rate": (r > 0).mean(),
+            "VaR 5%": value_at_risk(r, 0.05),
+            "CVaR 5%": conditional_value_at_risk(r, 0.05),
             "Skewness": pd.Series(r).skew(),
             "Excess Kurtosis": pd.Series(r).kurt(),
             "# Days": mask.sum(),

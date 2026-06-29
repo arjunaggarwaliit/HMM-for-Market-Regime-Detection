@@ -1,0 +1,150 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[a4paper,left=1.2in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{amsmath}
+\usepackage{setspace}
+\onehalfspacing
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+\title{Machine Learning Notebook Review and Regime Detection Results}
+\author{Aarush Gupta (2024AIB1174) \and Arjun Aggarwal (2024AIB1289)}
+\date{Generated for SPY, 2018-01-01 to 2024-12-31}
+\begin{document}
+\maketitle
+
+\section{Objective}
+This report reviews the four machine learning notebooks in the HMM Market Regime Detection repository: from-scratch HMM implementation, library-based HMM implementation, alternative regime detection methods, and model comparison. The review verifies notebook execution, checks for numerically unreasonable outputs, expands the financial metric layer, and reproduces a consolidated regime study for SPY. The interactive project is available at \url{https://arjunaggarwaliit.github.io/HMM-for-Market-Regime-Detection/} and the repository is available at \url{https://github.com/arjunaggarwaliit/HMM-for-Market-Regime-Detection}.
+
+\section{Research Context}
+Hidden Markov Models are suitable for market-regime analysis because the market state is latent and consecutive regimes are temporally dependent. Rabiner's classical HMM tutorial frames the three core computational problems as likelihood evaluation, hidden-state decoding, and parameter estimation; the notebooks map these directly to the Forward algorithm, Viterbi decoding, and Baum-Welch/EM training. The hmmlearn documentation describes Gaussian HMMs as generative models with a start-probability vector and transition matrix, which is why transition persistence is reviewed explicitly. GMM and K-Means baselines are also appropriate: scikit-learn documents GMM as a finite mixture of Gaussian components and K-Means as minimizing within-cluster inertia. However, these clustering models do not directly estimate Markov transition probabilities. Isolation Forest and DBSCAN are better interpreted as stress/anomaly detectors than complete bull-neutral-bear regime models.
+
+\section{Notebook Execution Review}
+All four notebooks execute after review. The library notebook originally produced an implausible nearly alternating transition pattern and made the regime-overlay plotting cell slow because thousands of tiny state segments were created. This was corrected by using a sticky transition prior for the one-dimensional Gaussian HMM, diagonal covariance for the univariate return sequence, bounded EM iterations, and a default skip for the optional pomegranate demonstration. The pomegranate implementation remains documented but is not executed by default because recent CPU-only notebook runs can be slow. The other notebooks executed without compilation errors after folder-path updates.
+
+\section{Financial Metrics Added}
+The regime statistics were expanded beyond mean return and volatility. Sharpe ratio measures return per unit of total volatility. Sortino ratio focuses on downside volatility, which is more meaningful when upside volatility is not undesirable. Maximum drawdown measures the worst compounded peak-to-trough loss while the model is in a state. Calmar ratio compares annual return with drawdown. Hit rate measures the fraction of positive-return observations. VaR 5\% estimates the 5th percentile daily loss threshold, while CVaR 5\% estimates the average loss in the worst 5\% tail. These metrics make the regime labels economically interpretable rather than purely visual.
+
+\section{Model Comparison Summary}
+\begin{table}[H]
+\centering
+\caption{Consolidated model behavior on SPY.}
+\small
+\begin{tabular}{lrrrp{0.38\textwidth}}
+\toprule
+Model & States & Mean Persistence & Average Wasserstein & Main Interpretation \\
+\midrule
+HMM Scratch & 3 & 38.4300 & 0.0236 & Persistent latent volatility regimes with full educational transparency. \\
+hmmlearn HMM & 3 & 91.1700 & 0.0253 & Production-style Gaussian HMM with sticky transition prior. \\
+GMM & 3 & 3.1500 & 0.0273 & Distributional clustering without temporal memory. \\
+K-Means & 3 & 4.8700 & 0.0236 & Scaled feature-space clustering baseline. \\
+DBSCAN & 3 & 49.6000 & 0.0180 & Density/noise stress detector sensitive to epsilon. \\
+Isolation Forest & 2 & 28.3400 & 0.0244 & Binary anomaly overlay for stress periods. \\
+Wasserstein & 3 & 124.0700 & 0.0074 & Rolling-window distributional regime clustering. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Event Comparison Against Actual Market Highs and Lows}
+The event table compares inferred model states with well-known market periods in the sample. The COVID crash trough and 2022 bear-market trough should generally be identified as high-risk or stress states by useful models. Calm rally dates should generally map to low or medium volatility regimes.
+\begin{table}[H]
+\centering
+\caption{Model states around major observed market events. Lower state numbers are sorted toward lower volatility where applicable.}
+\scriptsize
+\begin{tabular}{llrrrrrrrrrr}
+\toprule
+event & date & close & return & rvol\_20d & HMM Scratch & hmmlearn HMM & GMM & K-Means & DBSCAN & Isolation Forest & Wasserstein \\
+\midrule
+COVID crash trough & 2020-03-23 & 204.4183 & -0.0259 & 0.8326 & 2 & 2 & 2 & 2 & 3 & 1 & 1 \\
+2022 bear-market trough & 2022-10-12 & 339.3785 & -0.0033 & 0.2411 & 1 & 1 & 1 & 1 & 0 & 0 & 1 \\
+2023 soft-landing rally & 2023-07-31 & 441.0342 & 0.0019 & 0.0798 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+Late-2024 high & 2024-12-06 & 595.5750 & 0.0019 & 0.0746 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Detailed Regime Statistics}
+
+\begin{table}[H]
+\centering
+\caption{Regime risk metrics for HMM Scratch.}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
+\midrule
+0 & 0.3838 & 0.0915 & 4.1940 & 6.9042 & -0.0470 & 0.6173 & 55.5759 \\
+1 & -0.1218 & 0.2250 & -0.5414 & -0.8378 & -0.3189 & 0.4726 & 42.2913 \\
+2 & -1.3373 & 0.7620 & -1.7550 & -2.8623 & -0.3275 & 0.4286 & 2.1328 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Regime risk metrics for hmmlearn HMM.}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
+\midrule
+0 & 0.3057 & 0.1114 & 2.7448 & 3.9308 & -0.0997 & 0.5945 & 66.1182 \\
+1 & -0.1074 & 0.2384 & -0.4507 & -0.6939 & -0.2631 & 0.4743 & 31.9927 \\
+2 & -1.8251 & 0.7992 & -2.2837 & -3.9076 & -0.3044 & 0.3871 & 1.8891 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Regime risk metrics for GMM.}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
+\midrule
+0 & 4.3320 & 0.0549 & 78.8588 & -- & 0.0000 & 1.0000 & 8.1658 \\
+1 & 0.0941 & 0.1028 & 0.9156 & 1.4277 & -0.3927 & 0.5437 & 83.7294 \\
+2 & -3.6924 & 0.4888 & -7.5536 & -15.4287 & -0.8529 & 0.1880 & 8.1048 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Regime risk metrics for K-Means.}
+\small
+\begin{tabular}{rrrrrrrr}
+\toprule
+State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
+\midrule
+0 & 0.6324 & 0.1128 & 5.6068 & 12.1174 & -0.0335 & 0.6154 & 82.8763 \\
+1 & -4.6955 & 0.2332 & -20.1361 & -20.9593 & -0.9751 & 0.0402 & 12.1268 \\
+2 & 3.5739 & 0.3837 & 9.3140 & 19.7900 & -0.0592 & 0.7439 & 4.9970 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\section{Interpretation}
+The from-scratch HMM and hmmlearn HMM both identify persistent low-volatility and high-volatility regimes, with the high-volatility state concentrated around large drawdowns. The scratch implementation is valuable educationally because it exposes Forward-Backward, Viterbi, and Baum-Welch mechanics; the library implementation is more concise and better suited for repeatable production-style experiments once transition priors are controlled. GMM separates return distributions well but has no memory, so it can switch more abruptly than HMM. K-Means is useful as a feature-space baseline, especially when returns, absolute returns, realized volatility, and momentum are scaled together. DBSCAN identifies density-separated stress/noise regions but is sensitive to epsilon. Isolation Forest is best treated as a stress detector: its output is binary and should not be read as a full regime taxonomy. Wasserstein clustering provides a distributional view over rolling windows and is useful when the shape of return distributions changes across time.
+
+\section{Conclusion}
+The reviewed notebooks are now executable, folder names are cleaner, metrics are more financially informative, and the model outputs are bounded against unreasonable transition behavior. The consolidated SPY run supports the expected inference: high-volatility/stress states align with observed crisis or bear-market periods, while low-volatility states dominate calmer rising markets. The most robust analytical workflow is to use HMMs for temporal regime detection, GMM/K-Means as sanity-check baselines, and anomaly models only as stress overlays.
+
+\section{References}
+\begin{enumerate}
+\item L. R. Rabiner, ``A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition,'' Proceedings of the IEEE, 1989.
+\item hmmlearn documentation, \url{https://hmmlearn.readthedocs.io/}.
+\item scikit-learn Gaussian Mixture documentation, \url{https://scikit-learn.org/stable/modules/mixture.html}.
+\item scikit-learn clustering documentation, \url{https://scikit-learn.org/stable/modules/clustering.html}.
+\item scikit-learn Isolation Forest documentation, \url{https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.IsolationForest.html}.
+\item Ray documentation for remote tasks, \url{https://docs.ray.io/en/latest/ray-core/tasks.html}.
+\item Google OR-Tools documentation, \url{https://developers.google.com/optimization}.
+\end{enumerate}
+
+\end{document}

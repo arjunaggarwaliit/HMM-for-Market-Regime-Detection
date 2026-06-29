@@ -18,7 +18,7 @@ Market regimes, distinct periods characterized by persistent levels of volatilit
 
 - **Dual HMM Implementation:** Includes a **from-scratch, NumPy-based HMM** (Forward-Backward, Viterbi, Baum-Welch) for educational clarity, alongside optimized implementations using industry-standard libraries like `hmmlearn` and `pomegranate`.
 - **Comprehensive Benchmarking:** Compares HMMs with a wide array of alternative methods including GMMs, K-Means, DBSCAN, Agglomerative Clustering, Isolation Forest, Random Forest, and Wasserstein-distance based clustering.
-- **Rigorous Quantitative Evaluation:** Employs a robust set of financial and statistical metrics such as **Log-Likelihood, AIC/BIC, Regime Persistence, Regime Purity, Conditional Sharpe Ratio, and Wasserstein Distances** to objectively assess and compare model performance.
+- **Rigorous Quantitative Evaluation:** Employs financial and statistical metrics such as **Log-Likelihood, AIC/BIC, Regime Persistence, Regime Purity, Sharpe, Sortino, Max Drawdown, Calmar, VaR/CVaR, Hit Rate, and Wasserstein Distances** to assess model quality and financial interpretability.
 - **Modular and Reproducible Design:** Built with a clear separation of concerns: utility modules for data fetching, preprocessing, visualization, and metrics; and a logical progression of Jupyter notebooks for a structured research workflow.
 - **Interactive Visualizations:** Features rich, interactive Plotly charts that overlay detected regimes on price charts, display state transition matrices, and visualize distributional characteristics of each regime.
 
@@ -38,10 +38,10 @@ HMM-for-Market-Regime-Detection/
 |-- docs/                        # Project report and mathematical reference PDFs
 |-- examples/                    # Reusable Python API examples
 |-- utils/                       # Research utility modules used by notebooks
-|-- 01_hmm_from_scratch/         # Educational NumPy HMM implementation
-|-- 02_hmm_libraries/            # Library-based HMM experiments
-|-- 03_alternative_methods/      # Alternative clustering/ML approaches
-|-- 04_model_comparison/         # Model comparison notebooks
+|-- hmm_from_scratch/            # Educational NumPy HMM implementation
+|-- hmm_libraries/               # Library-based HMM experiments
+|-- alternative_methods/         # Alternative clustering/ML approaches
+|-- model_comparison/            # Model comparison notebooks
 |-- docker-compose.yml           # Full-stack local container orchestration
 |-- package.json                 # React/Vite dependencies and scripts
 `-- README.md
@@ -325,10 +325,17 @@ jupyter lab
 
 Run the notebooks in the recommended order to follow the research narrative:
 
-1. `01_hmm_from_scratch/01_hmm_from_scratch.ipynb` - Understand the inner workings of an HMM by using a custom implementation.
-2. `02_hmm_libraries/02_hmm_libraries.ipynb` - See how the same problem is solved efficiently using `hmmlearn` and `pomegranate`.
-3. `03_alternative_methods/03_alternative_methods.ipynb` - Explore how other unsupervised and supervised methods perform on the regime detection task.
-4. `04_model_comparison/04_model_comparison.ipynb` - Examine the final comparative analysis across all models to draw conclusions.
+1. `hmm_from_scratch/hmm_from_scratch.ipynb` - Understand the inner workings of an HMM by using a custom implementation.
+2. `hmm_libraries/hmm_libraries.ipynb` - See how the same problem is solved efficiently using `hmmlearn` and `pomegranate`.
+3. `alternative_methods/alternative_methods.ipynb` - Explore how other unsupervised and supervised methods perform on the regime detection task.
+4. `model_comparison/model_comparison.ipynb` - Examine the final comparative analysis across all models to draw conclusions.
+
+The consolidated notebook review and reproduced SPY results are documented in
+`docs/ml_notebook_review_report.tex`. Recreate the report inputs with:
+
+```bash
+python scripts/generate_ml_review_report.py
+```
 
 ---
 
@@ -342,7 +349,7 @@ The project follows a rigorous, multi-stage methodology:
 
 3. **Regime Interpretation:** Decoded states are analyzed post-hoc. Statistical summaries of returns and volatility are computed for each state to assign meaningful labels (e.g., *"Low Volatility Bull"*, *"High Volatility Bear"*, *"Transitional"*).
 
-4. **Comparative Evaluation:** A dashboard-style notebook (`04_model_comparison`) presents a unified comparison of all models using the defined metrics, providing a clear, quantitative basis for assessing model suitability.
+4. **Comparative Evaluation:** A dashboard-style notebook (`model_comparison`) presents a unified comparison of all models using the defined metrics, providing a clear, quantitative basis for assessing model suitability.
 
 ---
 
@@ -355,13 +362,17 @@ The project follows a rigorous, multi-stage methodology:
 | **Regime Persistence** | The average duration (in days) of a regime. Higher persistence often corresponds to more interpretable and stable regimes. |
 | **Regime Purity** | Compares predicted regimes against a simple, threshold-based volatility regime ("Low", "Med", "High") to measure alignment with an intuitive baseline. |
 | **Conditional Sharpe Ratio** | Calculates the risk-adjusted return within each identified regime, providing a direct financial interpretation of the regime's characteristics. |
+| **Sortino Ratio** | Measures annualized return relative to downside volatility, which is useful when upside volatility should not be penalized. |
+| **Max Drawdown / Calmar** | Captures worst compounded peak-to-trough loss and compares annualized return against that drawdown. |
+| **Hit Rate** | Measures the fraction of positive-return days inside each regime. |
+| **VaR / CVaR 5%** | Estimates the 5th percentile loss threshold and average loss in the worst 5% tail of each regime. |
 | **Wasserstein Distance** | Measures the "earth mover's distance" between the empirical return distributions of different regimes. Larger distances indicate better separation and distinctiveness of the identified states. |
 
 ---
 
 ## Implementation Details
 
-### `01_hmm_from_scratch`
+### `hmm_from_scratch`
 
 This module contains a fully self-contained `GaussianHMM` class written in Python with NumPy. It implements all core algorithms:
 
@@ -370,7 +381,7 @@ This module contains a fully self-contained `GaussianHMM` class written in Pytho
 - `viterbi()` - Implements the Viterbi algorithm in log-space for numerical stability.
 - `fit()` - Performs parameter learning via the Expectation-Maximization (Baum-Welch) algorithm.
 
-### `02_hmm_libraries`
+### `hmm_libraries`
 
 This notebook demonstrates the practical application of HMMs using two popular libraries:
 
