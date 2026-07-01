@@ -374,7 +374,7 @@ The project follows a rigorous, multi-stage methodology:
 
 ### `hmm_from_scratch`
 
-This module contains a fully self-contained `GaussianHMM` class written in Python with NumPy. It implements all core algorithms:
+This module contains a fully self contained `GaussianHMM` class written in Python with NumPy. It implements all core algorithms:
 
 - `forward_pass()` - Computes scaled forward probabilities.
 - `backward_pass()` - Computes scaled backward probabilities.
