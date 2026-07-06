@@ -55,6 +55,7 @@ export default function Dashboard() {
   const summary = useMemo(() => buildSummary(result), [result]);
   const stateRows = useMemo(() => buildStateRows(result), [result]);
   const tapeRows = useMemo(() => buildTapeRows(result), [result]);
+  const matrixRows = useMemo(() => buildMatrixRows(result), [result]);
   const ticker = result?.ticker ?? formValues.ticker.toUpperCase();
   const hasResult = Boolean(result);
 
@@ -140,30 +141,75 @@ export default function Dashboard() {
           ))}
         </nav>
 
-        <div className="context-row">
-          <ContextPill label="Close" value={summary.latestClose} />
-          <ContextPill label="Regime" value={summary.latestRegime} />
-          <ContextPill label="Sample" value={`${summary.observations} sessions`} />
-        </div>
+        <section className="terminal-board">
+          <section className="chart-surface main-chart-panel">
+            {status === "loading" && (
+              <div className="loading-panel">
+                <div className="loader" />
+                <span>Fitting regime model</span>
+              </div>
+            )}
 
-        <section className="chart-surface">
-          {status === "loading" && (
-            <div className="loading-panel">
-              <div className="loader" />
-              <span>Fitting regime model</span>
-            </div>
-          )}
+            {hasResult && status !== "loading" && (
+              <ActiveView activeView={activeView} key={`${activeView}-${result.ticker}-${result.dates.length}`} result={result} />
+            )}
 
-          {hasResult && status !== "loading" && (
-            <ActiveView activeView={activeView} key={`${activeView}-${result.ticker}-${result.dates.length}`} result={result} />
-          )}
+            {!hasResult && status !== "loading" && (
+              <div className="empty-state">
+                <h2>Ready for market data</h2>
+                <p>Submit a ticker and date range to generate regime output.</p>
+              </div>
+            )}
+          </section>
 
-          {!hasResult && status !== "loading" && (
-            <div className="empty-state">
-              <h2>Ready for market data</h2>
-              <p>Submit a ticker and date range to generate regime output.</p>
-            </div>
-          )}
+          <section className="lower-dock">
+            <section className="dock-card wide">
+              <div className="console-heading">
+                <h2>Session tape</h2>
+                <span>{ticker}</span>
+              </div>
+              <div className="dock-tape">
+                {tapeRows.slice(0, 6).map((row) => (
+                  <div className="dock-line" key={`dock-${row.date}-${row.label}`}>
+                    <span>{row.date}</span>
+                    <strong>{row.label}</strong>
+                    <em className={row.returnValue >= 0 ? "positive" : "negative"}>
+                      {(row.returnValue * 100).toFixed(2)}%
+                    </em>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="dock-card">
+              <div className="console-heading">
+                <h2>Transition preview</h2>
+                <span>{summary.states} states</span>
+              </div>
+              <div className="matrix-preview">
+                {matrixRows.map((row) => (
+                  <div className="matrix-row" key={`matrix-${row.state}`}>
+                    <strong>S{row.state}</strong>
+                    {row.values.map((value, index) => (
+                      <span key={`${row.state}-${index}`}>{value}</span>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="dock-card">
+              <div className="console-heading">
+                <h2>Run status</h2>
+                <span>{status}</span>
+              </div>
+              <div className="context-row dock-context">
+                <ContextPill label="Close" value={summary.latestClose} />
+                <ContextPill label="Regime" value={summary.latestRegime} />
+                <ContextPill label="Sample" value={`${summary.observations} sessions`} />
+              </div>
+            </section>
+          </section>
         </section>
       </section>
 
@@ -309,6 +355,21 @@ function buildTapeRows(result) {
       };
     })
     .reverse();
+}
+
+function buildMatrixRows(result) {
+  if (!result || !result.transition_probabilities?.length) {
+    return [
+      { state: "-", values: ["-", "-", "-"] },
+      { state: "-", values: ["-", "-", "-"] },
+      { state: "-", values: ["-", "-", "-"] },
+    ];
+  }
+
+  return result.transition_probabilities.map((row, index) => ({
+    state: index,
+    values: row.map((value) => Number(value).toFixed(2)),
+  }));
 }
 
 function buildSummary(result) {

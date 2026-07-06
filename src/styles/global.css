@@ -67,7 +67,8 @@ button:disabled {
 .market-strip,
 .view-switcher,
 .context-pill,
-.chart-surface {
+.chart-surface,
+.dock-card {
   border: 1px solid rgba(111, 135, 166, 0.32);
   background: linear-gradient(180deg, rgba(19, 29, 43, 0.96), rgba(10, 16, 26, 0.98));
   box-shadow:
@@ -256,7 +257,7 @@ button:disabled {
 
 .workspace {
   display: grid;
-  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 10px;
 }
 
@@ -393,14 +394,25 @@ button:disabled {
 }
 
 .chart-surface {
-  min-height: 620px;
+  min-height: 0;
   overflow: hidden;
+}
+
+.terminal-board {
+  display: grid;
+  grid-template-rows: minmax(460px, 1fr) minmax(188px, 0.36fr);
+  gap: 10px;
+  min-height: calc(100vh - 250px);
+}
+
+.main-chart-panel {
+  min-height: 460px;
 }
 
 .chart-panel,
 .optimization-panel {
   min-width: 0;
-  min-height: 620px;
+  min-height: 100%;
   padding: 14px;
   background: linear-gradient(180deg, rgba(9, 15, 24, 0.98), rgba(6, 11, 18, 0.98));
 }
@@ -419,6 +431,115 @@ button:disabled {
 
 .plot {
   width: 100%;
+}
+
+.lower-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.85fr) minmax(220px, 0.8fr);
+  gap: 10px;
+  min-height: 188px;
+}
+
+.dock-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(21, 32, 47, 0.96), rgba(8, 14, 23, 0.98)),
+    repeating-linear-gradient(0deg, rgba(111, 135, 166, 0.04), rgba(111, 135, 166, 0.04) 1px, transparent 1px, transparent 24px);
+}
+
+.dock-tape {
+  display: grid;
+  gap: 1px;
+  overflow: auto;
+  background: rgba(111, 135, 166, 0.18);
+}
+
+.dock-line {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) 70px;
+  align-items: center;
+  gap: 10px;
+  min-height: 27px;
+  padding: 0 9px;
+  background: rgba(7, 13, 22, 0.92);
+}
+
+.dock-line span,
+.dock-line em {
+  color: #8293aa;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.dock-line strong {
+  overflow: hidden;
+  color: #dce8f7;
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dock-line em {
+  text-align: right;
+}
+
+.dock-line em.positive {
+  color: #63d471;
+}
+
+.dock-line em.negative {
+  color: #ff6b5f;
+}
+
+.matrix-preview {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  overflow: auto;
+}
+
+.matrix-row {
+  display: grid;
+  grid-auto-columns: minmax(42px, 1fr);
+  grid-auto-flow: column;
+  grid-template-columns: 34px;
+  align-items: center;
+  gap: 5px;
+}
+
+.matrix-row strong,
+.matrix-row span {
+  border: 1px solid rgba(111, 135, 166, 0.24);
+  border-radius: 3px;
+  padding: 7px 6px;
+  background: rgba(5, 11, 19, 0.82);
+  color: #dce8f7;
+  font-size: 11px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.matrix-row strong {
+  color: #63a4ff;
+}
+
+.dock-context {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+  gap: 8px;
+}
+
+.dock-context .context-pill {
+  justify-content: space-between;
+  min-width: 0;
 }
 
 .right-console {
@@ -590,6 +711,14 @@ button:disabled {
   .right-console {
     display: none;
   }
+
+  .lower-dock {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 0.8fr);
+  }
+
+  .dock-card:last-child {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 960px) {
@@ -601,6 +730,23 @@ button:disabled {
   .market-strip {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .terminal-board {
+    grid-template-rows: auto auto;
+    min-height: auto;
+  }
+
+  .main-chart-panel {
+    min-height: 420px;
+  }
+
+  .lower-dock {
+    grid-template-columns: 1fr;
+  }
+
+  .dock-card:last-child {
+    grid-column: auto;
+  }
 }
 
 @media (max-width: 640px) {
@@ -611,5 +757,23 @@ button:disabled {
   .chart-panel,
   .optimization-panel {
     padding: 10px;
+  }
+
+  .terminal-topbar {
+    grid-template-columns: 1fr;
+    gap: 3px;
+    padding: 8px 10px;
+  }
+
+  .terminal-topbar strong {
+    text-align: left;
+  }
+
+  .dock-line {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+
+  .dock-line em {
+    grid-column: 2;
   }
 }
