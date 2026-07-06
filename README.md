@@ -82,7 +82,7 @@ cd HMM-for-Market-Regime-Detection
 It is highly recommended to use a virtual environment.
 
 ```bash
-python -m venv venv
+py -3.12 -m venv venv
 source venv/bin/activate   # On Windows: venv\Scripts\activate
 pip install -r requirements/base.txt
 pip install -r requirements/backend.txt
