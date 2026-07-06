@@ -13,7 +13,7 @@ export default function ReturnsChart({ result }) {
             type: "bar",
             name: "Return",
             marker: {
-              color: result.returns.map((value) => (value >= 0 ? "#0f766e" : "#dc2626")),
+              color: result.returns.map((value) => (value >= 0 ? "#63d471" : "#ff6b5f")),
             },
             hovertemplate: "%{x}<br>Return: %{y:.3f}%<extra></extra>",
           },

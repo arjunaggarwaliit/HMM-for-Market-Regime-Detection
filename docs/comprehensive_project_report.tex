@@ -1,0 +1,582 @@
+\documentclass[12pt,a4paper]{report}
+
+\usepackage[a4paper,left=1.2in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{newtxtext,newtxmath}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\onehalfspacing
+\setlist{itemsep=3pt, topsep=4pt}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+\titleformat{\chapter}
+  {\normalfont\bfseries\fontsize{15}{18}\selectfont\centering}
+  {\thechapter}
+  {1em}
+  {\MakeUppercase}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesection}
+  {1em}
+  {\MakeUppercase}
+
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesubsection}
+  {1em}
+  {}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{1.0cm}
+    {\Large\bfseries HMM Market Regime Detection Platform\par}
+    \vspace{0.4cm}
+    {\large\bfseries Machine Learning, Full-Stack Deployment, Distributed Computing, and Optimization\par}
+    \vspace{1.0cm}
+    {\large Project Report\par}
+    \vspace{0.8cm}
+    {\large submitted by\par}
+    \vspace{0.4cm}
+    {\large\bfseries Aarush Gupta\par}
+    {\large 2024AIB1174\par}
+    \vspace{0.3cm}
+    {\large\bfseries Arjun Aggarwal\par}
+    {\large 2024AIB1289\par}
+    \vfill
+    {\large Department of Artificial Intelligence and Data Engineering\par}
+    {\large Indian Institute of Technology Ropar\par}
+    \vspace{0.7cm}
+    {\large July 2026\par}
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+This report presents a comprehensive technical description of the HMM Market Regime Detection Platform, a full-stack financial analytics system for identifying latent market regimes from historical stock data. The project combines probabilistic machine learning, classical statistical finance metrics, modern backend API design, interactive frontend visualization, distributed computing, mathematical optimization, containerization, and Kubernetes deployment. The core model is a Gaussian Hidden Markov Model (HMM), implemented both from scratch for educational transparency and through established Python libraries for practical experimentation. The system also compares HMMs with alternative regime detection methods including Gaussian Mixture Models, K-Means, DBSCAN, Isolation Forest, Random Forest classification, and Wasserstein-distance clustering. 
+
+The software architecture separates data loading, preprocessing, model training, inference, visualization, API routes, services, schemas, Ray tasks, OR-Tools optimization, React components, Docker configuration, and Kubernetes manifests. The backend exposes REST endpoints for health checks, direct prediction, ticker-based prediction, batch prediction, and simple regime-aware optimization. The frontend provides an interactive dashboard for ticker input, price visualization, regime overlays, hidden-state timelines, returns charts, transition probability heatmaps, regime distribution charts, and optimization controls. The deployment layer includes Docker Compose for local full-stack execution and Kubernetes manifests for educational Minikube deployment.
+
+The report explains the mathematical foundation of HMMs, the complete data and model pipeline, the implemented notebooks, the backend and frontend design, distributed execution using Ray, basic optimization using OR-Tools, deployment workflows, reproduced SPY-based experimental results, major inferences, limitations, and future scope. The final platform demonstrates how a research notebook workflow can be transformed into a modular, reproducible, and interactive machine learning application.
+
+\tableofcontents
+\listoftables
+
+\chapter*{List of Symbols, Abbreviations and Nomenclature}
+\addcontentsline{toc}{chapter}{List of Symbols, Abbreviations and Nomenclature}
+\begin{longtable}{p{0.25\textwidth}p{0.65\textwidth}}
+\toprule
+\textbf{Symbol or Term} & \textbf{Meaning} \\
+\midrule
+$O_t$ & Observable market feature vector at time $t$ \\
+$S_t$ & Hidden market regime at time $t$ \\
+$N$ & Number of hidden states or regimes \\
+$T$ & Length of the observed time series \\
+$A$ & HMM transition probability matrix \\
+$a_{ij}$ & Probability of transition from state $i$ to state $j$ \\
+$\pi$ & Initial hidden-state probability vector \\
+$\mu_i$ & Mean of Gaussian emission distribution for state $i$ \\
+$\Sigma_i$ & Covariance of Gaussian emission distribution for state $i$ \\
+HMM & Hidden Markov Model \\
+GMM & Gaussian Mixture Model \\
+OHLCV & Open, High, Low, Close, Volume financial data \\
+API & Application Programming Interface \\
+REST & Representational State Transfer \\
+Ray & Distributed computing framework used for parallel workers \\
+OR-Tools & Google optimization toolkit used for the educational solver layer \\
+Vite & Frontend build tool used with React \\
+Plotly & Interactive charting library used in the dashboard \\
+Docker & Containerization platform for reproducible deployments \\
+Kubernetes & Container orchestration system used through minimal Minikube manifests \\
+VaR & Value at Risk \\
+CVaR & Conditional Value at Risk \\
+\bottomrule
+\end{longtable}
+
+\clearpage
+\pagenumbering{arabic}
+
+\chapter{Introduction}
+\section{Background}
+Financial markets do not follow a single stationary process over time. A security may experience periods of stable growth, sudden high-volatility selloffs, sideways consolidation, sharp recovery, or low-liquidity uncertainty. These changing phases are often called market regimes. A market regime is not directly observed in the same way as price, volume, or daily return. Instead, it is a latent state inferred from observable market behavior.
+
+Regime detection is important because financial strategies are often regime-dependent. A strategy that performs well during a calm bullish market may behave poorly during a high-volatility drawdown. A volatility-sensitive risk manager may reduce exposure during stress regimes, while a trend-oriented strategy may increase exposure during persistent low-volatility growth periods. This project uses machine learning to infer these hidden states and presents them in an interactive, deployable platform.
+
+\section{Project Motivation}
+Many machine learning finance projects remain limited to notebooks. While notebooks are useful for experimentation, they are not enough for a complete application. A useful regime detection system must also support data loading, preprocessing, model training, inference, validation, visualization, API access, frontend interaction, containerized deployment, and reproducibility. The project was therefore designed as both a research workflow and a production-style software platform.
+
+The system begins with research notebooks that implement and compare multiple models. It then exposes the chosen workflow through a reusable Python package, a FastAPI backend, and a React dashboard. The project also includes Ray for parallel processing, OR-Tools for a simple optimization layer, Docker for containerization, and Kubernetes manifests for deployment practice.
+
+\section{Objectives}
+The major objectives are:
+\begin{itemize}
+    \item Implement Hidden Markov Model market regime detection from scratch.
+    \item Compare the scratch implementation with library-based HMM models.
+    \item Evaluate alternative regime detection methods.
+    \item Add meaningful financial metrics for interpreting model outputs.
+    \item Build a reusable Python package for regime prediction.
+    \item Create a FastAPI backend with clean routes, schemas, and services.
+    \item Create a modern React dashboard with interactive Plotly visualizations.
+    \item Use Ray for parallel ticker analysis and distributed task execution.
+    \item Use OR-Tools for a simple educational optimization problem.
+    \item Containerize the application using Docker and Docker Compose.
+    \item Add minimal Kubernetes support using deployments and NodePort services.
+    \item Produce a reproducible technical report with model inferences.
+\end{itemize}
+
+\section{Repository and Website}
+The source code is hosted at:
+\begin{center}
+\url{https://github.com/arjunaggarwaliit/HMM-for-Market-Regime-Detection}
+\end{center}
+The interactive project website is intended to be available through GitHub Pages at:
+\begin{center}
+\url{https://arjunaggarwaliit.github.io/HMM-for-Market-Regime-Detection/}
+\end{center}
+Users can run the dashboard locally or through Docker Compose to explore different ticker symbols and date ranges.
+
+\chapter{Related Work}
+\section{Market Regime Detection}
+Market regime detection is a common problem in quantitative finance. Traditional approaches include threshold-based volatility segmentation, moving average crossovers, macroeconomic cycle classification, and drawdown-based rules. These methods are simple and interpretable, but they depend heavily on manually selected thresholds.
+
+Machine learning approaches attempt to discover regimes from data. Clustering methods such as K-Means and Gaussian Mixture Models group observations according to feature similarity. Density methods such as DBSCAN can identify unusual regions of the feature space. Anomaly detection methods such as Isolation Forest can flag stress periods. However, many of these methods treat observations as independent and do not model the temporal persistence that is typical of market regimes.
+
+\section{Hidden Markov Models in Finance}
+Hidden Markov Models are especially suitable for regime detection because they model latent state sequences and state transition probabilities. In finance, HMMs have been used for volatility regime detection, bear-market identification, crisis classification, risk monitoring, and tactical allocation research. The transition matrix provides a direct way to measure regime persistence and switching probability.
+
+The classical HMM framework is based on three problems: evaluating the likelihood of an observation sequence, decoding the most likely hidden state path, and learning model parameters from data. These correspond to the Forward algorithm, Viterbi algorithm, and Baum-Welch algorithm respectively.
+
+\section{Alternative Models}
+The project compares HMMs with several alternative methods:
+\begin{itemize}
+    \item Gaussian Mixture Models, which cluster observations using a probabilistic mixture distribution.
+    \item K-Means, which partitions scaled feature vectors into clusters.
+    \item DBSCAN, which detects density-separated regions and noise points.
+    \item Isolation Forest, which identifies unusual or stress-like observations.
+    \item Random Forest, which predicts observable volatility labels from features.
+    \item Wasserstein clustering, which groups rolling return windows by distributional distance.
+\end{itemize}
+These alternatives provide useful baselines and help determine whether HMM outputs are financially meaningful.
+
+\chapter{Theoretical Foundation}
+\section{Hidden Markov Model Definition}
+Let $O = \{O_1, O_2, \ldots, O_T\}$ be the observed sequence of market features and let $S = \{S_1, S_2, \ldots, S_T\}$ be the hidden regime sequence. The hidden state $S_t$ belongs to one of $N$ states:
+\begin{equation}
+    S_t \in \{1, 2, \ldots, N\}.
+\end{equation}
+The Markov assumption states that the current hidden state depends only on the previous hidden state:
+\begin{equation}
+    P(S_t \mid S_{1:t-1}) = P(S_t \mid S_{t-1}).
+\end{equation}
+The emission assumption states that the current observation depends only on the current hidden state:
+\begin{equation}
+    P(O_t \mid S_{1:t}, O_{1:t-1}) = P(O_t \mid S_t).
+\end{equation}
+The model is defined as:
+\begin{equation}
+    \lambda = (A, B, \pi),
+\end{equation}
+where $A$ is the transition matrix, $B$ is the emission distribution, and $\pi$ is the initial probability vector.
+
+\section{Transition Matrix}
+The transition matrix is:
+\begin{equation}
+A =
+\begin{bmatrix}
+a_{11} & a_{12} & \cdots & a_{1N}\\
+a_{21} & a_{22} & \cdots & a_{2N}\\
+\vdots & \vdots & \ddots & \vdots\\
+a_{N1} & a_{N2} & \cdots & a_{NN}
+\end{bmatrix}.
+\end{equation}
+Each entry is:
+\begin{equation}
+    a_{ij} = P(S_t=j \mid S_{t-1}=i).
+\end{equation}
+Rows sum to one. In financial interpretation, high diagonal values indicate persistent regimes, while off-diagonal values represent switching probabilities.
+
+\section{Gaussian Emissions}
+The project primarily models return observations. In the univariate case:
+\begin{equation}
+    O_t \mid S_t=i \sim \mathcal{N}(\mu_i, \sigma_i^2).
+\end{equation}
+For multivariate features:
+\begin{equation}
+    O_t \mid S_t=i \sim \mathcal{N}(\mu_i, \Sigma_i).
+\end{equation}
+States are interpreted by comparing their mean return, volatility, drawdown, and tail-risk metrics.
+
+\section{Forward Algorithm}
+The Forward algorithm computes:
+\begin{equation}
+    \alpha_t(i) = P(O_1, O_2, \ldots, O_t, S_t=i \mid \lambda).
+\end{equation}
+The initialization is:
+\begin{equation}
+    \alpha_1(i) = \pi_i b_i(O_1).
+\end{equation}
+The recursion is:
+\begin{equation}
+    \alpha_t(j) = b_j(O_t)\sum_{i=1}^{N}\alpha_{t-1}(i)a_{ij}.
+\end{equation}
+Scaling is used in the scratch implementation to avoid numerical underflow.
+
+\section{Backward Algorithm}
+The Backward algorithm computes:
+\begin{equation}
+    \beta_t(i) = P(O_{t+1}, O_{t+2}, \ldots, O_T \mid S_t=i, \lambda).
+\end{equation}
+The recursion is:
+\begin{equation}
+    \beta_t(i) = \sum_{j=1}^{N} a_{ij}b_j(O_{t+1})\beta_{t+1}(j).
+\end{equation}
+Forward and Backward variables are used to compute posterior state probabilities.
+
+\section{Viterbi Algorithm}
+The Viterbi algorithm finds the most likely hidden state sequence:
+\begin{equation}
+    \hat{S}_{1:T} = \arg\max_{S_{1:T}} P(S_{1:T} \mid O_{1:T}, \lambda).
+\end{equation}
+The implementation uses log probabilities for stability. Viterbi decoding provides the hidden state sequence shown in the dashboard.
+
+\section{Baum-Welch Learning}
+Baum-Welch is an Expectation-Maximization method for HMM parameter learning. The expectation step computes state and transition responsibilities. The maximization step updates $\pi$, $A$, $\mu_i$, and $\sigma_i$. Iteration continues until convergence or until the maximum number of iterations is reached.
+
+\chapter{Machine Learning Notebooks}
+\section{Notebook Organization}
+The notebook folders were renamed to make the repository cleaner:
+\begin{itemize}
+    \item \texttt{hmm\_from\_scratch}
+    \item \texttt{hmm\_libraries}
+    \item \texttt{alternative\_methods}
+    \item \texttt{model\_comparison}
+\end{itemize}
+This naming is clearer for GitHub users and avoids course-style numeric prefixes in the repository root.
+
+\section{HMM from Scratch}
+The scratch notebook implements the HMM algorithms directly with NumPy and SciPy. It demonstrates the Forward algorithm, Backward algorithm, posterior state probability computation, Viterbi decoding, and Baum-Welch training. The scratch implementation is valuable because it reveals the mechanics that are hidden inside library calls.
+
+The scratch implementation uses scaled Forward and Backward passes to avoid numerical underflow. It initializes state means using return percentiles and estimates state standard deviations iteratively. After training, states are ordered by volatility so that State 0 is generally lower volatility and higher-numbered states represent increasingly volatile conditions.
+
+\section{HMM with Libraries}
+The library notebook uses \texttt{hmmlearn} as the main executed library baseline. It also documents \texttt{pomegranate} as an optional HMM library. During review, the \texttt{hmmlearn} model originally learned an implausible nearly alternating transition pattern. Such a transition matrix is unrealistic for market regimes because regimes should usually persist for more than one day. This was corrected by using a sticky transition prior, diagonal covariance for the univariate return sequence, and bounded EM iterations.
+
+The \texttt{pomegranate} demonstration is retained but skipped by default during full notebook execution because recent CPU-only versions may run slowly. This keeps the notebook reliable while still documenting the library option.
+
+\section{Alternative Methods}
+The alternative-methods notebook compares HMM outputs with GMM, K-Means, DBSCAN, Isolation Forest, Random Forest, and Wasserstein clustering. Each method serves a different purpose. GMM provides a probabilistic mixture baseline. K-Means clusters scaled return-volatility feature vectors. DBSCAN identifies dense and noisy areas of feature space. Isolation Forest flags stress observations. Random Forest predicts observable volatility labels. Wasserstein clustering groups rolling return distributions.
+
+\section{Model Comparison}
+The comparison notebook brings all methods into one evaluation workflow. It compares log-likelihood where applicable, AIC/BIC, persistence, purity against observable volatility labels, Wasserstein distances, and conditional financial metrics. This notebook is used to determine whether the HMM states are economically meaningful and whether alternative methods confirm or contradict the inferred regimes.
+
+\chapter{Data Pipeline and Feature Engineering}
+\section{Data Loading}
+Historical market data is fetched using Yahoo Finance through the \texttt{yfinance} package. The raw OHLCV fields include Open, High, Low, Close, and Volume. The project also supports direct OHLCV input through the backend \texttt{/predict} endpoint.
+
+\section{Return Computation}
+The central observation is daily log return:
+\begin{equation}
+    r_t = \log(P_t) - \log(P_{t-1}),
+\end{equation}
+where $P_t$ is the adjusted closing price at time $t$. Log returns are additive over time and are widely used in financial modeling.
+
+\section{Realized Volatility}
+Realized volatility is computed over rolling windows. For a window of size $w$:
+\begin{equation}
+    \sigma_{t,w} = \sqrt{252}\cdot \text{Std}(r_{t-w+1}, \ldots, r_t).
+\end{equation}
+The annualization factor $\sqrt{252}$ assumes approximately 252 trading days per year.
+
+\section{Additional Features}
+Alternative models use additional features such as absolute return, squared return, rolling skewness, rolling kurtosis, short-term momentum, and Garman-Klass volatility. These features help clustering algorithms identify more than just raw return magnitude.
+
+\chapter{Financial Evaluation Metrics}
+\section{Need for Financial Metrics}
+Regime labels are not useful unless they correspond to meaningful financial behavior. Therefore, the project extends model evaluation beyond statistical fit. Each regime is evaluated using return, volatility, persistence, tail risk, drawdown, and distributional separation.
+
+\section{Implemented Metrics}
+\begin{table}[H]
+\centering
+\caption{Financial and statistical metrics used in the project.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{p{0.28\textwidth}p{0.62\textwidth}}
+\toprule
+\textbf{Metric} & \textbf{Interpretation} \\
+\midrule
+Log-Likelihood & Measures model fit to the observed sequence. \\
+AIC/BIC & Penalized model-selection criteria balancing fit and complexity. \\
+Regime Persistence & Average number of consecutive days spent in each regime. \\
+Regime Purity & Alignment with observable volatility labels. \\
+Sharpe Ratio & Annualized return per unit of total volatility. \\
+Sortino Ratio & Annualized return per unit of downside volatility. \\
+Maximum Drawdown & Worst compounded peak-to-trough loss within a regime. \\
+Calmar Ratio & Annualized return divided by absolute maximum drawdown. \\
+Hit Rate & Fraction of positive-return days in a regime. \\
+VaR 5\% & Daily loss threshold exceeded by approximately 5\% of observations. \\
+CVaR 5\% & Average daily loss inside the worst 5\% tail. \\
+Wasserstein Distance & Distributional distance between regime return distributions. \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Interpretation}
+A useful regime model should not only maximize likelihood; it should separate market states in a financially interpretable manner. A low-volatility bullish state should have higher Sharpe, smaller drawdown, and milder tail risk. A stress state should show higher volatility, lower hit rate, worse VaR/CVaR, and larger drawdowns. Persistence is also important because regimes that switch every day are difficult to interpret.
+
+\chapter{Backend Architecture}
+\section{FastAPI Design}
+The backend is implemented using FastAPI. FastAPI provides automatic OpenAPI documentation, high performance, and request validation through Pydantic. The backend contains separate route, schema, service, Ray task, and optimization modules.
+
+\section{Backend Directory Structure}
+\begin{table}[H]
+\centering
+\caption{Backend module responsibilities.}
+\begin{tabular}{p{0.32\textwidth}p{0.55\textwidth}}
+\toprule
+\textbf{Directory} & \textbf{Responsibility} \\
+\midrule
+\texttt{app/routes} & REST endpoint definitions. \\
+\texttt{app/schemas} & Pydantic request and response models. \\
+\texttt{app/services} & Business logic for prediction, batch processing, Ray, and optimization. \\
+\texttt{app/ray\_tasks} & Ray remote task definitions. \\
+\texttt{app/optimization} & OR-Tools solver implementation. \\
+\texttt{market\_regime} & Reusable machine learning package. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{API Endpoints}
+\begin{table}[H]
+\centering
+\caption{FastAPI endpoints.}
+\begin{tabular}{p{0.28\textwidth}p{0.58\textwidth}}
+\toprule
+\textbf{Endpoint} & \textbf{Purpose} \\
+\midrule
+\texttt{GET /health} & Health check for deployment and monitoring. \\
+\texttt{POST /predict} & Accepts OHLCV JSON data and returns regime prediction. \\
+\texttt{POST /predict-ticker} & Downloads ticker data and returns dates, prices, returns, hidden states, transition probabilities, and labels. \\
+\texttt{POST /batch-predict} & Processes multiple tickers in parallel using Ray when available. \\
+\texttt{POST /optimize} & Runs simple OR-Tools allocation optimization. \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Service Layer}
+The backend avoids placing business logic directly inside route functions. Instead, route functions validate inputs and call services. The service layer handles data download, preprocessing, model inference, batch processing, Ray fallback, and optimization. This modularity improves maintainability and testing.
+
+\section{Error Handling}
+The backend handles invalid tickers, empty datasets, failed downloads, malformed JSON, and failed worker tasks. In batch prediction, one failed ticker does not necessarily fail the whole request; results can include successful outputs and error messages.
+
+\chapter{Frontend Architecture}
+\section{React and Vite}
+The frontend is implemented using React with Vite. React functional components and hooks manage form state, API requests, loading states, errors, and chart rendering. Vite provides fast development and optimized production builds.
+
+\section{Dashboard Design}
+The dashboard is designed as a market research workspace. It includes a left analysis panel for ticker input, model defaults, and output status. The main workspace contains ticker summary, latest close, latest return, current regime, state count, view tabs, and chart panels.
+
+\section{Visualizations}
+The dashboard includes:
+\begin{itemize}
+    \item Stock price history chart.
+    \item Regime-colored price chart.
+    \item Hidden state timeline.
+    \item Returns chart.
+    \item Transition probability heatmap.
+    \item Regime distribution chart.
+    \item OR-Tools optimization panel.
+\end{itemize}
+
+\section{Frontend API Layer}
+API calls are isolated in frontend service modules. This keeps UI components focused on rendering and interaction rather than HTTP details. The API base URL is configurable for local, Docker, and Kubernetes environments.
+
+\chapter{Distributed Computing with Ray}
+\section{Motivation}
+Batch regime analysis across multiple ticker symbols is naturally parallel. Each ticker can be downloaded, preprocessed, modeled, and summarized independently. Ray is used to demonstrate distributed execution with remote workers.
+
+\section{Ray Task Architecture}
+The architecture follows:
+\begin{center}
+FastAPI Route $\rightarrow$ Service Layer $\rightarrow$ Ray Worker $\rightarrow$ Existing Prediction Service $\rightarrow$ Response
+\end{center}
+Ray tasks reuse the same business logic as sequential execution. If Ray is unavailable, the application falls back to sequential processing.
+
+\section{Batch Prediction}
+The \texttt{/batch-predict} endpoint accepts multiple ticker symbols and date ranges. Ray workers process each ticker in parallel and return combined results. Failed ticker analyses are handled individually, improving robustness.
+
+\chapter{Optimization with OR-Tools}
+\section{Purpose}
+The OR-Tools layer demonstrates how regime analysis can feed into a simple mathematical optimization problem. It is intentionally educational and not intended as a production portfolio optimizer.
+
+\section{Optimization Formulation}
+The solver can be expressed as:
+\begin{equation}
+    \max \sum_{i=1}^{M} p_i x_i,
+\end{equation}
+subject to:
+\begin{equation}
+    \sum_{i=1}^{M} c_i x_i \leq C,
+\end{equation}
+\begin{equation}
+    \sum_{i=1}^{M} r_i x_i \leq R,
+\end{equation}
+where $x_i$ is the number of units of asset $i$, $p_i$ is expected profit, $c_i$ is asset cost, $C$ is the budget, $r_i$ is risk score, and $R$ is maximum allowed risk.
+
+\section{Execution Flow}
+The optimization architecture is:
+\begin{center}
+FastAPI $\rightarrow$ Ray Worker $\rightarrow$ OR-Tools Solver $\rightarrow$ Response
+\end{center}
+If Ray is not installed or cannot initialize, the same solver runs locally.
+
+\chapter{Deployment Architecture}
+\section{Docker}
+The backend Dockerfile uses a Python slim image, installs backend dependencies, copies the application and package, exposes port 8000, and runs Uvicorn. The frontend Dockerfile uses a multi-stage build: Node builds the Vite app, and Nginx serves the production files.
+
+\section{Docker Compose}
+Docker Compose starts backend and frontend services together. The frontend communicates with the backend through Docker networking and an Nginx proxy path. The application can be started using:
+\begin{center}
+\texttt{docker compose up --build}
+\end{center}
+
+\section{Kubernetes}
+The Kubernetes layer includes simple deployments and services for backend and frontend. It uses replicas, labels, selectors, container ports, resource requests, resource limits, and NodePort services. The manifests are intentionally minimal and aligned with lecture concepts rather than advanced production Kubernetes.
+
+\chapter{Experimental Results and Inferences}
+\section{Experimental Setup}
+The consolidated report script runs a reproducible SPY experiment over the period 2018-01-01 to 2024-12-31. This period includes the COVID crash, the 2022 bear-market drawdown, the 2023 recovery, and the late-2024 market high. This makes it useful for comparing inferred model states against actual market highs and lows.
+
+\section{Model Comparison}
+\begin{table}[H]
+\centering
+\caption{Summary of consolidated SPY model behavior.}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrp{0.48\textwidth}}
+\toprule
+\textbf{Model} & \textbf{States} & \textbf{Mean Persistence} & \textbf{Interpretation} \\
+\midrule
+HMM Scratch & 3 & 38.43 & Persistent latent volatility regimes with educational transparency. \\
+hmmlearn HMM & 3 & 91.17 & Production-style Gaussian HMM with sticky transition prior. \\
+GMM & 3 & 3.15 & Distributional clustering without temporal memory. \\
+K-Means & 3 & 4.87 & Scaled feature-space clustering baseline. \\
+DBSCAN & 3 & 49.60 & Density/noise stress detector sensitive to epsilon. \\
+Isolation Forest & 2 & 28.34 & Binary anomaly overlay for stress periods. \\
+Wasserstein & 3 & 124.07 & Rolling-window distributional regime clustering. \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Event-Level Interpretation}
+\begin{table}[H]
+\centering
+\caption{Model states around major observed market events.}
+\tiny
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrrrrr}
+\toprule
+\textbf{Event} & \textbf{Date} & \textbf{Close} & \textbf{Return} & \textbf{RVol 20d} & \textbf{HMM Scratch} & \textbf{hmmlearn HMM} & \textbf{GMM} & \textbf{K-Means} & \textbf{DBSCAN} & \textbf{Isolation Forest} & \textbf{Wasserstein} \\
+\midrule
+COVID crash trough & 2020-03-23 & 204.4183 & -0.0259 & 0.8326 & 2 & 2 & 2 & 2 & 3 & 1 & 1 \\
+2022 bear-market trough & 2022-10-12 & 339.3785 & -0.0033 & 0.2411 & 1 & 1 & 1 & 1 & 0 & 0 & 1 \\
+2023 soft-landing rally & 2023-07-31 & 441.0342 & 0.0019 & 0.0798 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+Late-2024 high & 2024-12-06 & 595.5750 & 0.0019 & 0.0746 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+\section{Inference}
+The COVID crash trough is correctly classified as a high-volatility or stress state by the HMMs, GMM, K-Means, DBSCAN, and Isolation Forest. The 2022 bear-market trough is generally classified as an intermediate or high-risk state. The 2023 rally and late-2024 high are mostly classified as lower-volatility states. This behavior matches financial intuition: severe market stress should map to high-volatility regimes, while stable rally periods should map to calmer regimes.
+
+\section{Strengths and Weaknesses of Models}
+The scratch HMM is the most educational because it exposes the algorithmic details. The library HMM is better for practical experimentation once priors are controlled. GMM is useful for distributional clustering but lacks temporal memory. K-Means is simple and interpretable but sensitive to scaling. DBSCAN is useful for detecting noise and stress but sensitive to the epsilon parameter. Isolation Forest is effective as an anomaly detector but should not be treated as a full regime classifier. Wasserstein clustering captures distributional shifts over rolling windows and gives a useful long-horizon view.
+
+\chapter{Quality Review and Corrections}
+\section{Notebook Execution}
+All four notebooks were executed after review. The library notebook initially showed unrealistic rapid switching in the transition matrix. This was corrected using a sticky transition prior and bounded training. The optional pomegranate section was made non-blocking by default to avoid CPU-only execution delays.
+
+\section{Repository Cleanup}
+The numbered notebook folders were renamed. Tracked Python cache files were removed. The README was updated to reflect new folder names and expanded metrics. Temporary executed notebook artifacts were not retained in the repository to avoid clutter.
+
+\section{Frontend Refinement}
+The frontend was restructured into a cleaner analytics dashboard with a left analysis panel, market summary strip, view switcher, context pills, and chart surface. The goal was to keep all existing functionality while reducing visual clutter and making the interface feel like a deliberate financial research tool.
+
+\chapter{Limitations}
+\section{Model Limitations}
+HMM regimes are latent statistical constructs, not guaranteed economic truths. State labels depend on fitted emissions and may change with ticker, date range, number of states, and random initialization. A regime model should not be interpreted as investment advice.
+
+\section{Data Limitations}
+Yahoo Finance data can contain adjustments, missing values, symbol-specific issues, and delayed updates. The project validates empty datasets and failed downloads, but data quality remains an external dependency.
+
+\section{Optimization Limitations}
+The OR-Tools optimization module is deliberately simple. It demonstrates variables, constraints, objective function, and solver output, but it does not implement advanced portfolio theory, covariance-aware risk modeling, transaction costs, slippage, or live trading constraints.
+
+\section{Deployment Limitations}
+The Kubernetes setup is educational and minimal. It does not include Helm, Ingress, autoscaling, monitoring, secrets management, persistent storage, or cloud-native production hardening.
+
+\chapter{Future Scope}
+Future improvements include:
+\begin{itemize}
+    \item Adding multi-feature HMM variants using returns, volatility, momentum, and volume.
+    \item Adding walk-forward validation and rolling retraining.
+    \item Adding persistent storage for historical prediction runs.
+    \item Adding authentication and user watchlists.
+    \item Adding CI/CD pipelines for testing, building, and deployment.
+    \item Adding richer report figures generated directly from model outputs.
+    \item Adding cloud deployment after the Minikube flow is stable.
+    \item Adding advanced optimization only after the educational solver layer is fully validated.
+\end{itemize}
+
+\chapter{Conclusion}
+The HMM Market Regime Detection Platform demonstrates a complete pipeline from probabilistic machine learning research to deployable full-stack software. The project implements HMMs from scratch, compares them with library and alternative models, evaluates results using meaningful financial metrics, exposes prediction through FastAPI, visualizes results in React, parallelizes tasks with Ray, demonstrates OR-Tools optimization, and supports Docker and Kubernetes deployment.
+
+The project shows that useful machine learning systems require more than a model. They require clean architecture, validation, reproducibility, visualization, and deployment support. The final platform is educational, modular, and extensible, making it a strong foundation for future work in financial machine learning and regime-aware analytics.
+
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\begin{enumerate}
+    \item L. R. Rabiner, ``A Tutorial on Hidden Markov Models and Selected Applications in Speech Recognition,'' Proceedings of the IEEE, 1989.
+    \item C. M. Bishop, Pattern Recognition and Machine Learning, Springer, 2006.
+    \item K. P. Murphy, Machine Learning: A Probabilistic Perspective, MIT Press, 2012.
+    \item hmmlearn documentation, \url{https://hmmlearn.readthedocs.io/}.
+    \item scikit-learn documentation, \url{https://scikit-learn.org/stable/}.
+    \item FastAPI documentation, \url{https://fastapi.tiangolo.com/}.
+    \item React documentation, \url{https://react.dev/}.
+    \item Plotly documentation, \url{https://plotly.com/javascript/}.
+    \item Ray documentation, \url{https://docs.ray.io/}.
+    \item Google OR-Tools documentation, \url{https://developers.google.com/optimization}.
+    \item Docker documentation, \url{https://docs.docker.com/}.
+    \item Kubernetes documentation, \url{https://kubernetes.io/docs/}.
+\end{enumerate}
+
+\appendix
+\chapter{Appendix: Functional Coverage}
+\section{Backend}
+The backend supports health checks, OHLCV prediction, ticker prediction, batch prediction, and optimization.
+\section{Frontend}
+The frontend supports ticker input, date input, loading states, error states, price charts, regime overlays, hidden-state timelines, returns charts, transition heatmaps, distribution charts, and optimization interaction.
+\section{Deployment}
+The project supports local execution, Docker Compose execution, and Minikube Kubernetes execution.
+
+\end{document}

@@ -6,6 +6,7 @@
 \usepackage{longtable}
 \usepackage{amsmath}
 \usepackage{setspace}
+\usepackage{graphicx}
 \onehalfspacing
 \hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
 \title{Machine Learning Notebook Review and Regime Detection Results}
@@ -51,17 +52,19 @@ The event table compares inferred model states with well-known market periods in
 \begin{table}[H]
 \centering
 \caption{Model states around major observed market events. Lower state numbers are sorted toward lower volatility where applicable.}
-\scriptsize
+\tiny
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llrrrrrrrrrr}
 \toprule
 event & date & close & return & rvol\_20d & HMM Scratch & hmmlearn HMM & GMM & K-Means & DBSCAN & Isolation Forest & Wasserstein \\
 \midrule
-COVID crash trough & 2020-03-23 & 204.4183 & -0.0259 & 0.8326 & 2 & 2 & 2 & 2 & 3 & 1 & 1 \\
+COVID crash trough & 2020-03-23 & 204.4182 & -0.0259 & 0.8326 & 2 & 2 & 2 & 2 & 3 & 1 & 1 \\
 2022 bear-market trough & 2022-10-12 & 339.3785 & -0.0033 & 0.2411 & 1 & 1 & 1 & 1 & 0 & 0 & 1 \\
-2023 soft-landing rally & 2023-07-31 & 441.0342 & 0.0019 & 0.0798 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
+2023 soft-landing rally & 2023-07-31 & 441.0343 & 0.0019 & 0.0798 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
 Late-2024 high & 2024-12-06 & 595.5750 & 0.0019 & 0.0746 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 \section{Detailed Regime Statistics}
@@ -69,7 +72,8 @@ Late-2024 high & 2024-12-06 & 595.5750 & 0.0019 & 0.0746 & 0 & 0 & 1 & 0 & 0 & 0
 \begin{table}[H]
 \centering
 \caption{Regime risk metrics for HMM Scratch.}
-\small
+\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{rrrrrrrr}
 \toprule
 State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
@@ -79,13 +83,15 @@ State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) 
 2 & -1.3373 & 0.7620 & -1.7550 & -2.8623 & -0.3275 & 0.4286 & 2.1328 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 
 \begin{table}[H]
 \centering
 \caption{Regime risk metrics for hmmlearn HMM.}
-\small
+\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{rrrrrrrr}
 \toprule
 State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
@@ -95,29 +101,33 @@ State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) 
 2 & -1.8251 & 0.7992 & -2.2837 & -3.9076 & -0.3044 & 0.3871 & 1.8891 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 
 \begin{table}[H]
 \centering
 \caption{Regime risk metrics for GMM.}
-\small
+\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{rrrrrrrr}
 \toprule
 State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
 \midrule
-0 & 4.3320 & 0.0549 & 78.8588 & -- & 0.0000 & 1.0000 & 8.1658 \\
+0 & 4.3320 & 0.0549 & 78.8589 & -- & 0.0000 & 1.0000 & 8.1658 \\
 1 & 0.0941 & 0.1028 & 0.9156 & 1.4277 & -0.3927 & 0.5437 & 83.7294 \\
 2 & -3.6924 & 0.4888 & -7.5536 & -15.4287 & -0.8529 & 0.1880 & 8.1048 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 
 \begin{table}[H]
 \centering
 \caption{Regime risk metrics for K-Means.}
-\small
+\scriptsize
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{rrrrrrrr}
 \toprule
 State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) & Max Drawdown & Hit Rate & \% of Sample \\
@@ -127,6 +137,7 @@ State & Mean Return (ann.) & Volatility (ann.) & Sharpe (ann.) & Sortino (ann.) 
 2 & 3.5739 & 0.3837 & 9.3140 & 19.7900 & -0.0592 & 0.7439 & 4.9970 \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 

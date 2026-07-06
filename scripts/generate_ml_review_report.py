@@ -119,12 +119,14 @@ def latex_table_from_stats(model_name: str, stats: list[dict]) -> str:
 \begin{{table}}[H]
 \centering
 \caption{{Regime risk metrics for {model_name}.}}
-\small
+\scriptsize
+\resizebox{{\textwidth}}{{!}}{{%
 \begin{{tabular}}{{rrrrrrrr}}
 \toprule
 {rows}
 \bottomrule
 \end{{tabular}}
+}}
 \end{{table}}
 """
 
@@ -165,6 +167,7 @@ def build_report(results: dict) -> str:
 \usepackage{{longtable}}
 \usepackage{{amsmath}}
 \usepackage{{setspace}}
+\usepackage{{graphicx}}
 \onehalfspacing
 \hypersetup{{colorlinks=true,linkcolor=black,urlcolor=blue}}
 \title{{Machine Learning Notebook Review and Regime Detection Results}}
@@ -202,12 +205,14 @@ The event table compares inferred model states with well-known market periods in
 \begin{{table}}[H]
 \centering
 \caption{{Model states around major observed market events. Lower state numbers are sorted toward lower volatility where applicable.}}
-\scriptsize
+\tiny
+\resizebox{{\textwidth}}{{!}}{{%
 \begin{{tabular}}{{llrrrrrrrrrr}}
 \toprule
 {event_rows}
 \bottomrule
 \end{{tabular}}
+}}
 \end{{table}}
 
 \section{{Detailed Regime Statistics}}

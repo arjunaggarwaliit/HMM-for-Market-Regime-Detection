@@ -15,11 +15,11 @@ export default function RegimePriceChart({ result }) {
             type: "scatter",
             mode: "lines+markers",
             name: "Close",
-            line: { color: "rgba(15, 23, 42, 0.28)", width: 2 },
+            line: { color: "rgba(201, 214, 230, 0.3)", width: 2 },
             marker: {
               color: colors,
               size: 7,
-              line: { color: "#ffffff", width: 0.8 },
+              line: { color: "#090f18", width: 0.8 },
             },
             text: result.predicted_regime_labels,
             hovertemplate: "%{x}<br>Close: %{y:.2f}<br>%{text}<extra></extra>",

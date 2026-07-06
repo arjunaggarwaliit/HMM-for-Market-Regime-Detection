@@ -53,15 +53,17 @@ export default function Dashboard() {
   }
 
   const summary = useMemo(() => buildSummary(result), [result]);
+  const stateRows = useMemo(() => buildStateRows(result), [result]);
+  const tapeRows = useMemo(() => buildTapeRows(result), [result]);
   const ticker = result?.ticker ?? formValues.ticker.toUpperCase();
   const hasResult = Boolean(result);
 
   return (
-    <main className="research-app">
+    <main className="terminal-shell">
       <aside className="analysis-panel">
         <div className="brand-mark">
           <span>HMM</span>
-          <strong>Market Regime Lab</strong>
+          <strong>Regime Desk</strong>
         </div>
 
         <section className="panel-card">
@@ -90,10 +92,30 @@ export default function Dashboard() {
           <DataRow label="Observations" value={summary.observations} />
           <DataRow label="Latest regime" value={summary.latestRegime} />
         </section>
+
+        <section className="panel-card compact-list">
+          <div className="panel-heading">
+            <span>04</span>
+            <h2>State tape</h2>
+          </div>
+          {stateRows.map((row) => (
+            <div className="state-row" key={`${row.state}-${row.share}`}>
+              <span className="state-dot" style={{ backgroundColor: row.color }} />
+              <strong>State {row.state}</strong>
+              <span>{row.share}</span>
+            </div>
+          ))}
+        </section>
       </aside>
 
       <section className="workspace">
-        <header className="market-strip">
+        <header className="terminal-topbar">
+          <span>Live research terminal</span>
+          <strong>{ticker} / daily regime model</strong>
+          <em>{status === "loading" ? "Running" : "Online"}</em>
+        </header>
+
+        <section className="market-strip">
           <div className="quote-block">
             <span>Regime analysis</span>
             <h1>{ticker}</h1>
@@ -103,7 +125,7 @@ export default function Dashboard() {
           <MetricTile label="Latest return" value={summary.latestReturn} tone={summary.returnTone} />
           <MetricTile label="Current regime" value={summary.latestRegime} wide />
           <MetricTile label="States" value={summary.states} />
-        </header>
+        </section>
 
         <nav className="view-switcher" aria-label="Analysis views">
           {views.map((view) => (
@@ -144,6 +166,51 @@ export default function Dashboard() {
           )}
         </section>
       </section>
+
+      <aside className="right-console">
+        <section className="console-card">
+          <div className="console-heading">
+            <h2>Regime Stream</h2>
+            <span>{ticker}</span>
+          </div>
+          <div className="signal-list">
+            {tapeRows.map((row) => (
+              <div className="signal-row" key={`${row.date}-${row.label}`}>
+                <div>
+                  <strong>{row.label}</strong>
+                  <span>{row.date}</span>
+                </div>
+                <em className={row.returnValue >= 0 ? "positive" : "negative"}>
+                  {(row.returnValue * 100).toFixed(2)}%
+                </em>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="console-card">
+          <div className="console-heading">
+            <h2>Engine</h2>
+            <span>Stack</span>
+          </div>
+          <div className="engine-grid">
+            <DataRow label="API" value="FastAPI" />
+            <DataRow label="Workers" value="Ray ready" />
+            <DataRow label="Solver" value="OR-Tools" />
+            <DataRow label="Charts" value="Plotly" />
+          </div>
+        </section>
+
+        <section className="console-card note-card">
+          <div className="console-heading">
+            <h2>Interpretation</h2>
+          </div>
+          <p>
+            High-volatility states indicate wider return dispersion and greater model-estimated stress.
+            Transition probabilities describe how sticky each market state is across sessions.
+          </p>
+        </section>
+      </aside>
     </main>
   );
 }
@@ -196,15 +263,63 @@ function DataRow({ label, value }) {
   );
 }
 
+function buildStateRows(result) {
+  if (!result || result.hidden_states.length === 0) {
+    return [
+      { state: "-", share: "-", color: "#65758b" },
+      { state: "-", share: "-", color: "#65758b" },
+      { state: "-", share: "-", color: "#65758b" },
+    ];
+  }
+
+  const total = result.hidden_states.length;
+  const colors = ["#63d471", "#f4c430", "#ff6b5f", "#63a4ff", "#b28cff"];
+  const counts = result.hidden_states.reduce((map, state) => {
+    map.set(state, (map.get(state) ?? 0) + 1);
+    return map;
+  }, new Map());
+
+  return [...counts.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([state, count]) => ({
+      state,
+      share: `${((count / total) * 100).toFixed(1)}%`,
+      color: colors[Math.abs(Number(state)) % colors.length],
+    }));
+}
+
+function buildTapeRows(result) {
+  if (!result || result.dates.length === 0) {
+    return [
+      { date: "Waiting", label: "No run loaded", returnValue: 0 },
+      { date: "Waiting", label: "Submit ticker", returnValue: 0 },
+      { date: "Waiting", label: "Model idle", returnValue: 0 },
+    ];
+  }
+
+  const start = Math.max(result.dates.length - 8, 0);
+  return result.dates
+    .slice(start)
+    .map((date, offset) => {
+      const index = start + offset;
+      return {
+        date,
+        label: result.predicted_regime_labels[index] ?? `State ${result.hidden_states[index]}`,
+        returnValue: Number(result.returns[index] ?? 0),
+      };
+    })
+    .reverse();
+}
+
 function buildSummary(result) {
   if (!result || result.close_prices.length === 0) {
     return {
-      observations: "—",
-      latestClose: "—",
-      latestCloseRaw: "—",
-      latestReturn: "—",
-      latestRegime: "—",
-      states: "—",
+      observations: "-",
+      latestClose: "-",
+      latestCloseRaw: "-",
+      latestReturn: "-",
+      latestRegime: "-",
+      states: "-",
       returnTone: "",
     };
   }

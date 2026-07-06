@@ -13,7 +13,7 @@ export default function StockPriceChart({ result }) {
             type: "scatter",
             mode: "lines",
             name: "Close",
-            line: { color: "#1d4ed8", width: 2.4 },
+            line: { color: "#63d471", width: 2.4 },
           },
         ]}
         layout={{
