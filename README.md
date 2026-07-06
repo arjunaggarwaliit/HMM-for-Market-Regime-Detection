@@ -331,8 +331,12 @@ Run the notebooks in the recommended order to follow the research narrative:
 3. `alternative_methods/alternative_methods.ipynb` - Explore how other unsupervised and supervised methods perform on the regime detection task.
 4. `model_comparison/model_comparison.ipynb` - Examine the final comparative analysis across all models to draw conclusions.
 
-The consolidated notebook review and reproduced SPY results are documented in
-`docs/ml_notebook_review_report.tex`. Recreate the report inputs with:
+The current Overleaf-ready reports are:
+
+- `docs/comprehensive_project_report.tex` - full 15-20 page project report covering ML, backend, frontend, Ray, OR-Tools, Docker, and Kubernetes.
+- `docs/ml_notebook_review_report.tex` - focused notebook review and reproduced SPY model comparison.
+
+Recreate the notebook-review report inputs with:
 
 ```bash
 python scripts/generate_ml_review_report.py
