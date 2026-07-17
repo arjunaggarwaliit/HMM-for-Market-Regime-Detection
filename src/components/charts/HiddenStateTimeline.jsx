@@ -13,7 +13,7 @@ export default function HiddenStateTimeline({ result }) {
             type: "scatter",
             mode: "lines+markers",
             name: "Hidden State",
-            line: { color: "#8fa2b8", width: 1.6, shape: "hv" },
+            line: { color: "#334155", width: 1.6, shape: "hv" },
             marker: {
               color: result.hidden_states.map(colorForState),
               size: 7,
